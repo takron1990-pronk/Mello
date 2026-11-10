@@ -57,7 +57,8 @@ module.exports = async (req, res) => {
       if (route === 'register') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) return send(400, { error: 'กรุณากรอกอีเมลให้ถูกต้อง' });
         if (password.length < 6) return send(400, { error: 'รหัสผ่านต้องยาวอย่างน้อย 6 ตัวอักษร' });
-        const displayName = String(body.displayName || username).trim().slice(0, 60) || username;
+        const displayName = String(body.displayName || '').trim().slice(0, 60);
+        if (!displayName) return send(400, { error: 'กรุณากรอกชื่อที่ใช้แสดง' });
         const { data, error } = await db.from('mello_users').insert({ username, display_name: displayName, password_hash: hashPw(password), state: cleanState() }).select().single();
         if (error) return send(error.code === '23505' ? 409 : 500, { error: error.code === '23505' ? 'ชื่อผู้ใช้นี้มีในระบบแล้ว' : 'เกิดข้อผิดพลาด กรุณาลองใหม่' });
         setSession(res, username);

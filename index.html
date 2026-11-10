@@ -2249,13 +2249,13 @@
         });
       };
 
-      const handleAuthLocal = (username, password, isRegister) => {
+      const handleAuthLocal = (username, password, isRegister, name) => {
         if (!username.trim() || !password.trim()) { alert('กรุณากรอกข้อมูลให้ครบถ้วน'); return false; }
         const trimmed = username.trim().toLowerCase();
         if (isRegister) {
           if (usersDb[trimmed]) { alert('ชื่อผู้ใช้นี้มีในระบบแล้ว'); return false; }
           const newUser = {
-            username: trimmed, displayName: username.trim(), password,
+            username: trimmed, displayName: (name || '').trim() || username.trim().split('@')[0], password,
             xp_zh: 0, xp_en: 0, completed_zh: [], completed_en: [], starred_zh: [], starred_en: [],
             createdAt: new Date().toISOString()
           };
@@ -2274,15 +2274,15 @@
         }
       };
 
-      const handleAuthServer = async (username, password, isRegister) => {
+      const handleAuthServer = async (username, password, isRegister, name) => {
         if (!username.trim() || !password.trim()) { alert('กรุณากรอกข้อมูลให้ครบถ้วน'); return false; }
         try {
-          const r = await apiCall('POST', isRegister ? '/api/register' : '/api/login', { username, password, displayName: username.trim().split('@')[0] });
+          const r = await apiCall('POST', isRegister ? '/api/register' : '/api/login', { username, password, displayName: (name || '').trim() });
           if (!r.ok) { alert(r.json.error || 'เกิดข้อผิดพลาด กรุณาลองใหม่'); return false; }
           adoptServerUser(r.json.user); setSyncStatus('saved'); setNavView('home'); return true;
         } catch (e) { alert('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาลองใหม่'); return false; }
       };
-      const handleAuth = (username, password, isRegister) => serverMode ? handleAuthServer(username, password, isRegister) : handleAuthLocal(username, password, isRegister);
+      const handleAuth = (username, password, isRegister, name) => serverMode ? handleAuthServer(username, password, isRegister, name) : handleAuthLocal(username, password, isRegister, name);
       const handleLogout = async () => {
         if (serverMode) {
           const sr = syncRef.current;
@@ -8110,10 +8110,15 @@
       const [isReg, setIsReg] = useState(false);
       const [u, setU] = useState('');
       const [p, setP] = useState('');
+      const [name, setName] = useState('');
       return (
         <div className="max-w-md mx-auto my-8 bg-white rounded-3xl p-6 sm:p-8 border border-mello-denim/20 shadow-md">
           <h2 className="text-2xl font-black text-center text-mello-denim mb-4">{isReg ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}</h2>
-          <form onSubmit={(e) => { e.preventDefault(); onAuth(u, p, isReg); }} className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); onAuth(u, p, isReg, name); }} className="space-y-4">
+            {isReg && <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">ชื่อที่ใช้แสดง</label>
+              <input required maxLength={60} value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2 rounded-xl border text-sm" placeholder="เช่น สมชาย" />
+            </div>}
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1">อีเมล</label>
               <input required type="email" autoComplete="email" value={u} onChange={e => setU(e.target.value)} className="w-full px-4 py-2 rounded-xl border text-sm" placeholder="you@example.com" />
