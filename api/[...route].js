@@ -23,7 +23,8 @@ const sessionUser = (req) => {
   if (!m) return null;
   const i = m[1].lastIndexOf('.'), body = m[1].slice(0, i), sig = m[1].slice(i + 1);
   const ok = sig.length === 64 && crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(sign(body)));
-  const [name, exp] = body.split('.');
+  const j = body.lastIndexOf('.'); // อีเมลมีจุดได้ จึงตัดที่จุดสุดท้าย
+  const name = body.slice(0, j), exp = body.slice(j + 1);
   return ok && Number(exp) > Date.now() ? decodeURIComponent(name) : null;
 };
 
