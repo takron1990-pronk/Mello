@@ -2380,7 +2380,7 @@
             </div>
           </header>
 
-          <main className={`flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 ${(navView === 'duo-drill' || navView === 'auth') ? '' : 'pb-24'}`}>
+          <main className={`flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 ${(navView === 'duo-drill' || navView === 'auth') ? '' : 'pb-40'}`}>
             {navView === 'auth' && <AuthView onAuth={handleAuth} onCancel={() => setNavView('home')} serverMode={serverMode} />}
             {navView === 'home' && (
               <HomeDashboard
