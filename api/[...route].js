@@ -53,8 +53,9 @@ module.exports = async (req, res) => {
     if ((route === 'register' || route === 'login') && req.method === 'POST') {
       const username = String(body.username || '').trim().toLowerCase();
       const password = String(body.password || '');
-      if (!username || username.length > 40 || !password) return send(400, { error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+      if (!username || username.length > 254 || !password) return send(400, { error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
       if (route === 'register') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) return send(400, { error: 'กรุณากรอกอีเมลให้ถูกต้อง' });
         if (password.length < 6) return send(400, { error: 'รหัสผ่านต้องยาวอย่างน้อย 6 ตัวอักษร' });
         const displayName = String(body.displayName || username).trim().slice(0, 60) || username;
         const { data, error } = await db.from('mello_users').insert({ username, display_name: displayName, password_hash: hashPw(password), state: cleanState() }).select().single();

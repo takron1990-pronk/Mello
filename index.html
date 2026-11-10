@@ -1908,7 +1908,7 @@
               </div>
               <div>
                 <h3 className="font-black text-lg text-gray-800">{currentUser ? currentUser.displayName : 'ผู้เยี่ยมชม (Guest)'}</h3>
-                <p className="text-xs text-gray-400">{currentUser ? `@${currentUser.username}` : 'ยังไม่ได้เข้าสู่ระบบ'}</p>
+                <p className="text-xs text-gray-400">{currentUser ? currentUser.username : 'ยังไม่ได้เข้าสู่ระบบ'}</p>
               </div>
               <div className="inline-flex items-center gap-1.5 bg-mello-frost border border-mello-denim/30 px-3 py-1 rounded-full text-xs font-bold text-mello-denim">
                 <span>⚡ {currentXP} XP</span>
@@ -2277,7 +2277,7 @@
       const handleAuthServer = async (username, password, isRegister) => {
         if (!username.trim() || !password.trim()) { alert('กรุณากรอกข้อมูลให้ครบถ้วน'); return false; }
         try {
-          const r = await apiCall('POST', isRegister ? '/api/register' : '/api/login', { username, password, displayName: username.trim() });
+          const r = await apiCall('POST', isRegister ? '/api/register' : '/api/login', { username, password, displayName: username.trim().split('@')[0] });
           if (!r.ok) { alert(r.json.error || 'เกิดข้อผิดพลาด กรุณาลองใหม่'); return false; }
           adoptServerUser(r.json.user); setSyncStatus('saved'); setNavView('home'); return true;
         } catch (e) { alert('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาลองใหม่'); return false; }
@@ -8115,14 +8115,14 @@
           <h2 className="text-2xl font-black text-center text-mello-denim mb-4">{isReg ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ'}</h2>
           <form onSubmit={(e) => { e.preventDefault(); onAuth(u, p, isReg); }} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">ชื่อผู้ใช้</label>
-              <input required value={u} onChange={e => setU(e.target.value)} className="w-full px-4 py-2 rounded-xl border text-sm" placeholder="username" />
+              <label className="block text-xs font-bold text-gray-700 mb-1">อีเมล</label>
+              <input required type="email" autoComplete="email" value={u} onChange={e => setU(e.target.value)} className="w-full px-4 py-2 rounded-xl border text-sm" placeholder="you@example.com" />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1">รหัสผ่าน</label>
               <input required type="password" value={p} onChange={e => setP(e.target.value)} className="w-full px-4 py-2 rounded-xl border text-sm" placeholder="••••••••" />
             </div>
-            {serverMode && <p className="text-[11px] text-gray-500">ชื่อผู้ใช้ 3–30 ตัว (a-z, 0-9, _ . -) · รหัสผ่านอย่างน้อย 6 ตัวอักษร</p>}
+            {serverMode && <p className="text-[11px] text-gray-500">ใช้อีเมลสมัครและเข้าสู่ระบบ · รหัสผ่านอย่างน้อย 6 ตัวอักษร</p>}
             <button type="submit" className="btn3d border-b-4 border-mello-pistachioDark w-full bg-mello-pistachio hover:bg-mello-pistachioDark text-white font-bold py-2.5 rounded-xl shadow">{isReg ? 'สร้างบัญชี' : 'เข้าสู่ระบบ'}</button>
           </form>
           <div className="mt-4 text-center text-xs space-y-2 border-t pt-3">
