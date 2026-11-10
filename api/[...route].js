@@ -41,7 +41,7 @@ const cleanState = (b = {}) => ({
 const toUser = (r) => ({ username: r.username, displayName: r.display_name, createdAt: r.created_at, ...cleanState(r.state) });
 
 module.exports = async (req, res) => {
-  const route = [].concat(req.query.route || []).join('/');
+  const route = new URL(req.url, 'http://x').pathname.replace(/^\/api\/?|\/$/g, '');
   const send = (code, json) => res.status(code).json(json);
   if (route === 'health') return send(200, { ok: !!(db && SESSION_SECRET) });
   if (!db || !SESSION_SECRET) return send(503, { error: 'เซิร์ฟเวอร์ยังไม่ได้ตั้งค่า' });
